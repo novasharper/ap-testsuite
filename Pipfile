@@ -1,0 +1,14 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+requests = "==2.28.1"
+
+[dev-packages]
+ap-testsuite = {path = ".", editable = true}
+build = "*"
+
+[requires]
+python_version = "3"

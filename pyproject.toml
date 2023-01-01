@@ -1,0 +1,15 @@
+[project]
+name = "ap-testsuite"
+version = "0.0.1"
+requires-python = ">=3.7"
+license = {file = "LICENSE"}
+dependencies = [
+    "requests==2.28.1"
+]
+
+[project.scripts]
+ap-test = "ap_test.__main__:main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
