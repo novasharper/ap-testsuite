@@ -1,7 +1,10 @@
 from datetime import datetime
+import logging
 from urllib.parse import unquote
 
 import requests
+
+log = logging.getLogger(__name__)
 
 PROFILE_TYPE = 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"'
 ACTIVITY_TYPE = "application/activity+json"
@@ -26,6 +29,7 @@ def post_headers() -> dict[str, str]:
 
 
 def get(iri: str, with_profile: bool = False):
+    log.info("GET %s", iri)
     r = requests.get(
         iri,
         headers=get_headers(with_profile),
