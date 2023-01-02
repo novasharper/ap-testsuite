@@ -6,6 +6,10 @@ This is meant to approximate the test suite at [go-fed/testsuite](https://github
 
 # TODO
 
+## General
+
+- [ ] Add support for configuring via config file instead of arguments
+
 ## Test cases
 
 Vocab:
