@@ -28,42 +28,33 @@ Vocab:
     }
 
 ### Common test cases
-- Actor Cases
+- [x] Get Actor
   
   Requires:
   - Actor ID
 
-  Cases:
-  - [ ] GET Actor
-    
-    Side effects:
-    - Adds remote actor to the database
+  Logic:
+  - Get actor based on id
+  - Use 'outbox' field of actor to get actor outbox
+  - Validate outbox object type. Must be one of:
+    - `OrderedCollection`
+    - `OrderedCollectionPage`
+  - If outbox is an `OrderedCollectionPage`, get first page and validate
+    that it is an `OrderedCollection`
 
-  - [ ] GET Actor Inbox
+- [x] Get Object
 
-    Requires:
-    - Actor in the database
-    Side Effects:
-    - Adds inbox to the database
-    - Saves inbox id (used in later test cases)
-
-  - [ ] Validate that Actor Inbox is OrderedCollection
-
-    Requires:
-    - Inbox in the database
-    - Saved inbox id
-
-- Object Cases
+  Validate that server supports both AS2 media types
 
   Requires:
   - Object ID
 
-  Cases:
-  - [ ] Dereferences Object Id with ld+json plus profile
+  Logic:
+  - Get object with `ld+json` media type:
 
     `Accept: application/ld+json; profile="https://www.w3.org/ns/activitystreams"`
 
-  - [ ] Dereferences Object Id with activity+json
+  - Get object with `activity+json` media type:
 
     `Accept: application/activity+json`
 
