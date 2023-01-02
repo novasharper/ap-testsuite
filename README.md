@@ -62,7 +62,7 @@ Vocab:
 
     `Accept: application/activity+json`
 
-- [-] Deleted Object
+- [x] Deleted Object
 
   Requires:
   - ID of deleted Object
@@ -86,7 +86,7 @@ Vocab:
   - Try to fetch invalid object
   - Check that error code is `404 Not Found`
 
-- [-] Private Object
+- [x] Private Object
 
   Requires:
   - ID of private Object
