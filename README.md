@@ -8,7 +8,7 @@ This is meant to approximate the test suite at [go-fed/testsuite](https://github
 
 ## General
 
-- [ ] Add support for configuring via config file instead of arguments
+- [x] Add support for configuring via config file instead of arguments
 
 ## Test cases
 

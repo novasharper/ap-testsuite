@@ -1,0 +1,4 @@
+[test_config]
+server = 'https://fosstodon.org'
+actor_id = 'users/LWN'
+object_id = 'users/LWN/statuses/109616553771932554/activity'

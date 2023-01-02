@@ -19,12 +19,26 @@ def run_tests(tests: list[BaseTest]):
 
 def main():
     parser = ap.ArgumentParser("ap-test")
-    parser.add_argument("--actor-id", required=True)
-    parser.add_argument("--object-id")
+    parser.add_argument("--config-file", "-c")
+    for arg in TestContext.ARGS:
+        parser.add_argument(f'--{arg.replace("_", "-")}')
     opt = parser.parse_args()
 
     ctx = TestContext()
-    ctx.actor_id = opt.actor_id
-    ctx.object_id = opt.object_id
+    loaded = False
+    if opt.config_file:
+        loaded = ctx.load_config(opt.config_file)
+    loaded |= ctx.load_opts(opt)
 
+    if not loaded:
+        print("No config passed.")
+        print()
+        print("Either pass config using arguments or via a TOML config file.")
+        return
+
+    print("=== RUNNING BASE TESTS ===")
     run_tests([tc(ctx) for tc in COMMON_TESTS])
+
+
+if __name__ == "__main__":
+    main()
