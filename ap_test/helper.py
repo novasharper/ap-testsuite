@@ -12,6 +12,12 @@ class TestContext:
         # Entity IDs
         "actor_id",
         "object_id",
+        "deleted_object_id",
+        "invalid_object_id",
+        "private_object_id",
+        # Config
+        "use_tombstone",
+        "use_forbidden",
     ]
 
     def __init__(self) -> None:
@@ -20,6 +26,12 @@ class TestContext:
         ## Entity IDs
         self.actor_id = None
         self.object_id = None
+        self.deleted_object_id = None
+        self.invalid_object_id = None
+        self.private_object_id = None
+        ## Config
+        self.use_tombstone = None
+        self.use_forbidden = None
 
     def validate(self, arg: str, argv: Any):
         if argv is None:

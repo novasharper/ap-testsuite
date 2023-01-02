@@ -62,7 +62,7 @@ Vocab:
 
     `Accept: application/activity+json`
 
-- [ ] Deleted Object
+- [-] Deleted Object
 
   Requires:
   - ID of deleted Object
@@ -74,7 +74,10 @@ Vocab:
     - `Tombstones?` => `410 Gone`
     - `No Tombstones.` => `404 Not Found`
 
-- [ ] Invalid Object
+  TODO:
+  - [ ] Need to find deleted object to validate that this works
+
+- [x] Invalid Object
 
   Requires:
   - ID of invalid Object
@@ -83,7 +86,7 @@ Vocab:
   - Try to fetch invalid object
   - Check that error code is `404 Not Found`
 
-- [ ] Private Object
+- [-] Private Object
 
   Requires:
   - ID of private Object
@@ -94,6 +97,9 @@ Vocab:
   - Check error code.
     - `Use 403` => `403 Forbidden`
     - `Otherwise` => `404 Not Found`
+
+  TODO:
+  - [ ] Need to find private object to validate that this works
 
 ### Federating test cases
   - [ ] Delivers all activities posted in the outbox
