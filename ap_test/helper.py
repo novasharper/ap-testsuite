@@ -3,11 +3,13 @@ try:
 except ImportError:
     import tomli as toml
 
-from urllib.parse import urljoin
+from typing import Any
+from urllib.parse import urljoin, urlparse
 
 
 class TestContext:
     ARGS = [
+        # Entity IDs
         "actor_id",
         "object_id",
     ]
@@ -15,16 +17,33 @@ class TestContext:
     def __init__(self) -> None:
         self.db = {}
         # ARGS
+        ## Entity IDs
         self.actor_id = None
         self.object_id = None
 
-    def setdefault(self, arg, argv):
+    def validate(self, arg: str, argv: Any):
+        if argv is None:
+            return
+
+        if arg.startswith("use_"):
+            if not isinstance(argv, bool):
+                raise TypeError(f"value for {arg} must be a boolean")
+
+        elif arg.endswith("_id"):
+            if not isinstance(argv, str):
+                raise TypeError(f"value for {arg} must be a string")
+
+            # Ensure that arg is a valid url
+            urlparse(argv)
+
+    def setarg(self, arg, argv):
         if arg not in self.ARGS:
             raise KeyError(f"Invalid arg {arg}")
 
-        if getattr(self, arg, None) is not None:
+        if argv is None and getattr(self, arg, None) is not None:
             return
 
+        self.validate(arg, argv)
         setattr(self, arg, argv)
 
     def load_opts(self, opt):
@@ -32,7 +51,7 @@ class TestContext:
         for arg in self.ARGS:
             argv = getattr(opt, arg, None)
             any_arg |= bool(argv)
-            self.setdefault(arg, argv)
+            self.setarg(arg, argv)
         return any_arg
 
     def load_config(self, config_file):
@@ -47,7 +66,7 @@ class TestContext:
             if arg.endswith("_id") and server and argv:
                 argv = urljoin(server, argv)
             any_arg |= bool(argv)
-            self.setdefault(arg, argv)
+            self.setarg(arg, argv)
 
         return any_arg
 

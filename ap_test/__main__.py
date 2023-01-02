@@ -33,7 +33,13 @@ def main():
     parser.add_argument("-v", dest="verbosity", action="count")
     parser.add_argument("--failfast", "-x", action="store_true")
     for arg in TestContext.ARGS:
-        parser.add_argument(f'--{arg.replace("_", "-")}')
+        if arg.endswith("_id"):
+            action = "store"
+        elif arg.startswith("use_"):
+            action = "store_true"
+        else:
+            raise ValueError(f"Unsupported argument format {arg}")
+        parser.add_argument(f'--{arg.replace("_", "-")}', action=action)
     opt = parser.parse_args()
 
     if opt.verbosity:
