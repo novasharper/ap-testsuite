@@ -14,11 +14,9 @@ class TestContext:
 
     def __init__(self) -> None:
         self.db = {}
-        self.set_default_args()
-
-    def set_default_args(self):
-        for arg in self.ARGS:
-            setattr(self, arg, None)
+        # ARGS
+        self.actor_id = None
+        self.object_id = None
 
     def setdefault(self, arg, argv):
         if arg not in self.ARGS:
