@@ -31,7 +31,9 @@ Vocab:
         }
     }
 
-### Common test cases
+<details><summary>Common test cases</summary>
+<p>
+
 - [x] Get Actor
   
   Requires:
@@ -101,7 +103,12 @@ Vocab:
   TODO:
   - [ ] Need to find private object to validate that this works
 
-### Federating test cases
+</p>
+</details>
+
+<details><summary>Federating test cases</summary>
+<p>
+
   - [ ] Delivers all activities posted in the outbox
   - [ ] GET Actor outbox
   - [ ] Outbox contains delivered Activities
@@ -142,3 +149,6 @@ Vocab:
   - [ ] Applied inbox forwarding
   - [ ] Does not process update activity from unauthorized actor
   - [ ] Confirm whether unauthorized update applied
+
+</p>
+</details>
