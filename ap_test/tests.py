@@ -114,9 +114,9 @@ class DeletedObject(BaseTest):
 
     def run(self) -> bool:
         expected_code = (
-            requests.codes.gone # pylint: disable=no-member
+            requests.codes.gone  # pylint: disable=no-member
             if self.ctx.use_tombstone
-            else requests.codes.not_found # pylint: disable=no-member
+            else requests.codes.not_found  # pylint: disable=no-member
         )
         try:
             log.info("Dereference deleted object")
@@ -176,9 +176,9 @@ class PrivateObject(BaseTest):
 
     def run(self) -> bool:
         expected_code = (
-            requests.codes.forbidden # pylint: disable=no-member
+            requests.codes.forbidden  # pylint: disable=no-member
             if self.ctx.use_forbidden
-            else requests.codes.not_found # pylint: disable=no-member
+            else requests.codes.not_found  # pylint: disable=no-member
         )
         try:
             log.info("Dereference private object")

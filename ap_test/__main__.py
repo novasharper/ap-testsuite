@@ -10,13 +10,13 @@ from ap_test.tests import BaseTest, COMMON_TESTS
 
 
 def run_tests(tests: list[BaseTest], failfast: bool = False):
-    def _log(msg, barrier='#'):
+    def _log(msg, barrier="#"):
         print(f"{barrier * 4} {msg} {barrier * 4}")
 
     for test in tests:
         test_name = test.__class__.__name__
         if test.skip():
-            _log(f"Skipping {test_name}", barrier='*')
+            _log(f"Skipping {test_name}", barrier="*")
             continue
 
         _log(f"Running {test_name}")

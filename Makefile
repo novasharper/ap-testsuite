@@ -9,4 +9,8 @@ pylint:
 		$(PIPENV) run pylint --rcfile $(PWD)/pylint.toml \
 		{} +
 
+format:
+	find $(PWD)/ap_test -name '*.py' -exec \
+		$(PIPENV) run black {} +
+
 .PHONY: pipenv pylint

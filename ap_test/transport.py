@@ -32,10 +32,6 @@ def post_headers() -> dict[str, str]:
 
 def get(iri: str, with_profile: bool = False):
     log.info("GET %s", iri)
-    r = requests.get(
-        iri,
-        headers=get_headers(with_profile),
-        timeout=30.
-    )
+    r = requests.get(iri, headers=get_headers(with_profile), timeout=30.0)
     r.raise_for_status()
     return r.json()
