@@ -3,9 +3,6 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
-[requires]
-python_version = "3"
-
 [packages]
 requests = "*"
 tomli = {version = ">=2.0", markers = "python_version < '3.11'"}
@@ -13,3 +10,4 @@ tomli = {version = ">=2.0", markers = "python_version < '3.11'"}
 [dev-packages]
 ap-testsuite = {path = ".", editable = true}
 build = "*"
+pylint = "*"

@@ -5,7 +5,7 @@ import logging
 
 import requests
 
-from .helper import TestContext, get_id
+from .helper import TestContext
 from . import transport
 
 log = logging.getLogger(__name__)
@@ -40,7 +40,7 @@ class ActorTest(BaseTest):
             log.info("Dereference Actor")
             actor = transport.get(self.ctx.actor_id)
         except requests.HTTPError:
-            log.error(f"Failed to get actor {self.ctx.actor_id}")
+            log.error("Failed to get actor %s", self.ctx.actor_id)
             return False
 
         outbox_iri = actor["outbox"]
@@ -48,13 +48,13 @@ class ActorTest(BaseTest):
             log.info("Dereference Actor outbox")
             outbox = transport.get(outbox_iri)
         except requests.HTTPError:
-            log.error(f"Failed to get actor outbox {outbox_iri}")
+            log.error("Failed to get actor outbox %s", outbox_iri)
             return False
 
         log.info("Validate outbox type")
         t = outbox["type"]
         if t not in ("OrderedCollection", "OrderedCollectionPage"):
-            log.error(f"Invalid outbox type {t}")
+            log.error("Invalid outbox type %s", t)
             return False
 
         if t == "OrderedCollection":
@@ -66,7 +66,7 @@ class ActorTest(BaseTest):
             try:
                 transport.get(outbox_page_iri)
             except requests.HTTPError:
-                log.error(f"Failed to get actor outbox page {outbox_iri}")
+                log.error("Failed to get actor outbox page %s")
                 return False
 
         return True
@@ -84,14 +84,14 @@ class ObjectTest(BaseTest):
             log.info("Dereference object (accept=activity+json)")
             transport.get(self.ctx.object_id)
         except requests.HTTPError as e:
-            log.error(f"Get with profile failed: {e}")
+            log.error("Get with profile failed: %s", e)
             return False
 
         try:
             log.info("Dereference object (accept=ld+json, profile specified)")
             transport.get(self.ctx.object_id, True)
         except requests.HTTPError as e:
-            log.error(f"Get with activity failed: {e}")
+            log.error("Get with activity failed: %s", e)
             return False
 
         return True
@@ -106,7 +106,9 @@ class DeletedObject(BaseTest):
 
     def run(self) -> bool:
         expected_code = (
-            requests.codes.gone if self.ctx.use_tombstone else requests.codes.not_found
+            requests.codes.gone # pylint: disable=no-member
+            if self.ctx.use_tombstone
+            else requests.codes.not_found # pylint: disable=no-member
         )
         try:
             log.info("Dereference deleted object")
@@ -146,6 +148,7 @@ class InvalidObject(BaseTest):
             return False
         except requests.HTTPError as e:
             resp: requests.Response = e.response
+            # pylint: disable=no-member
             if resp.status_code != requests.codes.not_found:
                 log.error(
                     "Invalid status code %s; expected %s",
@@ -165,9 +168,9 @@ class PrivateObject(BaseTest):
 
     def run(self) -> bool:
         expected_code = (
-            requests.codes.forbidden
+            requests.codes.forbidden # pylint: disable=no-member
             if self.ctx.use_forbidden
-            else requests.codes.not_found
+            else requests.codes.not_found # pylint: disable=no-member
         )
         try:
             log.info("Dereference private object")

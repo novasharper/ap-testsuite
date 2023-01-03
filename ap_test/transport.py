@@ -3,7 +3,6 @@
 
 from datetime import datetime
 import logging
-from urllib.parse import unquote
 
 import requests
 
@@ -36,6 +35,7 @@ def get(iri: str, with_profile: bool = False):
     r = requests.get(
         iri,
         headers=get_headers(with_profile),
+        timeout=30.
     )
     r.raise_for_status()
     return r.json()
