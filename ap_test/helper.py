@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Pat Long
+# SPDX-License-Identifier: MIT
+
 try:
     import tomllib as toml
 except ImportError:

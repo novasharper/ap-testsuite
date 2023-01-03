@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Pat Long
+# SPDX-License-Identifier: MIT
+
 from datetime import datetime
 import logging
 from urllib.parse import unquote

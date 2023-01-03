@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2023 Pat Long
+# SPDX-License-Identifier: MIT
 
 import argparse as ap
 import logging
