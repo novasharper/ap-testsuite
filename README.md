@@ -23,25 +23,6 @@ This is meant to approximate the test suite at [go-fed/testsuite](https://github
 
 ## Test cases
 
-Vocab:
-
-**Dereference** - Fully load JSON object.
-
-    Retrieved JSON objects can include links to other JSON objects/resources
-    on the server. Therefore, it is necessary to follow the links.
-
-    {
-        "object": "https://example.com/objects/test-object"
-    }
-
-    to
-
-    {
-        "object": {
-            "foo": "bar"
-        }
-    }
-
 <details><summary>Common test cases</summary>
 <p>
 
