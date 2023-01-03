@@ -9,6 +9,17 @@ This is meant to approximate the test suite at [go-fed/testsuite](https://github
 ## General
 
 - [x] Add support for configuring via config file instead of arguments
+- [ ] Add auth support
+
+  This is needed for Client2Server operations (e.g., getting the inbox)
+
+  Auth Types:
+  - [ ] OAuth flow (generate bearer token)
+  - [ ] Cookie Auth
+  - [ ] Password Auth
+
+  NOTE: OAuth flow will likely require password/cookie support to generate
+  bearer token.
 
 ## Test cases
 
