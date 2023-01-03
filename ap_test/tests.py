@@ -35,15 +35,7 @@ class ActorTest(BaseTest):
             return True
         return False
 
-    def run(self) -> bool:
-        try:
-            log.info("Dereference Actor")
-            actor = transport.get(self.ctx.actor_id)
-        except requests.HTTPError:
-            log.error("Failed to get actor %s", self.ctx.actor_id)
-            return False
-
-        outbox_iri = actor["outbox"]
+    def _check_outbox(self, outbox_iri: str) -> bool:
         try:
             log.info("Dereference Actor outbox")
             outbox = transport.get(outbox_iri)
@@ -57,19 +49,35 @@ class ActorTest(BaseTest):
             log.error("Invalid outbox type %s", t)
             return False
 
-        if t == "OrderedCollection":
-            log.info(
-                "Outbox was a collection, dereference + validate "
-                "referenced page type"
-            )
-            outbox_page_iri = outbox["first"]
-            try:
-                transport.get(outbox_page_iri)
-            except requests.HTTPError:
-                log.error("Failed to get actor outbox page %s")
-                return False
+        # Outbox contains list of objects. No need for further validation.
+        if "orderedItems" in outbox:
+            return True
+
+        log.info(
+            "Outbox references pages, dereference first page + validate "
+            "referenced page type"
+        )
+        try:
+            outbox_page = transport.get(outbox["first"])
+        except requests.HTTPError:
+            log.error("Failed to get actor outbox page %s")
+            return False
+
+        if outbox_page["type"] != "OrderedCollectionPage":
+            log.error("Invalid type for outbox page %s", outbox_page["type"])
+            return False
 
         return True
+
+    def run(self) -> bool:
+        try:
+            log.info("Dereference Actor")
+            actor = transport.get(self.ctx.actor_id)
+        except requests.HTTPError:
+            log.error("Failed to get actor %s", self.ctx.actor_id)
+            return False
+
+        return self._check_outbox(actor["outbox"])
 
 
 class ObjectTest(BaseTest):
