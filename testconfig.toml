@@ -1,7 +1,10 @@
 [test_config]
-server = 'https://fosstodon.org'
-actor_id = 'users/LWN'
-object_id = 'users/LWN/statuses/109616553771932554/activity'
-# deleted_object_id
-invalid_object_id = 'users/LWN/statuses/109616553771932550/activity'
-# private_object_id
+#server = 'https://fosstodon.org'
+user = 'LWN@fosstodon.org'
+
+#[test_config.resources]
+#actor_id = 'users/LWN'
+#object_id = 'users/LWN/statuses/109616553771932554/activity'
+#deleted_object_id = ''
+#invalid_object_id = 'users/LWN/statuses/109616553771932550/activity'
+#private_object_id = ''

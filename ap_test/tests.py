@@ -35,6 +35,38 @@ class ActorTest(BaseTest):
             return True
         return False
 
+    def _maybe_select_object(self, outboxItems: list[dict]):
+        activity = outboxItems[0]
+        object_id = activity["object"]["id"]
+        if self.ctx.object_id is None:
+            self.ctx.object_id = object_id
+
+        if self.ctx.invalid_object_id is None:
+            base = object_id.rsplit("/", 1)[0]
+            self.ctx.invalid_object_id = f"{base}/invalid-object-id"
+
+    def _check_outbox_page(self, outbox_page_iri: str) -> bool:
+        log.info(
+            "Outbox references pages, dereference first page + validate "
+            "referenced page type"
+        )
+        try:
+            outbox_page = transport.get(outbox_page_iri)
+        except requests.HTTPError:
+            log.error("Failed to get actor outbox page %s")
+            return False
+
+        if outbox_page["type"] != "OrderedCollectionPage":
+            log.error("Invalid type for outbox page %s", outbox_page["type"])
+            return False
+
+        if "orderedItems" not in outbox_page:
+            log.error("Could not find activity list in page")
+            return False
+
+        self._maybe_select_object(outbox_page["orderedItems"])
+        return True
+
     def _check_outbox(self, outbox_iri: str) -> bool:
         try:
             log.info("Dereference Actor outbox")
@@ -51,23 +83,10 @@ class ActorTest(BaseTest):
 
         # Outbox contains list of objects. No need for further validation.
         if "orderedItems" in outbox:
+            self._maybe_select_object(outbox["orderedItems"])
             return True
 
-        log.info(
-            "Outbox references pages, dereference first page + validate "
-            "referenced page type"
-        )
-        try:
-            outbox_page = transport.get(outbox["first"])
-        except requests.HTTPError:
-            log.error("Failed to get actor outbox page %s")
-            return False
-
-        if outbox_page["type"] != "OrderedCollectionPage":
-            log.error("Invalid type for outbox page %s", outbox_page["type"])
-            return False
-
-        return True
+        return self._check_outbox_page(outbox["first"])
 
     def run(self) -> bool:
         try:
