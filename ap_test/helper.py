@@ -2,13 +2,9 @@
 # SPDX-License-Identifier: MIT
 
 import logging
+import tomllib as toml
 from typing import Any
 from urllib.parse import urljoin, urlparse, urlencode
-
-try:
-    import tomllib as toml
-except ImportError:
-    import tomli as toml
 
 import requests
 

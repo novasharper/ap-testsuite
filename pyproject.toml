@@ -1,16 +1,19 @@
 [project]
 name = "ap-testsuite"
 version = "0.0.1"
-requires-python = ">=3.7"
+requires-python = ">=3.11"
 license = {file = "LICENSE"}
 dependencies = [
     "requests",
-    "tomli>=2.0; python_version < '3.11'"
 ]
 
 [project.scripts]
 ap-test = "ap_test.__main__:main"
 
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+pylint = "*"
+black = "*"
