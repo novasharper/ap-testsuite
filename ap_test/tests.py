@@ -53,7 +53,7 @@ class ActorTest(BaseTest):
         try:
             outbox_page = transport.get(outbox_page_iri)
         except requests.HTTPError:
-            log.error("Failed to get actor outbox page %s")
+            log.error("Failed to get actor outbox page %s", outbox_page_iri)
             return False
 
         if outbox_page["type"] != "OrderedCollectionPage":
