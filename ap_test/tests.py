@@ -184,6 +184,43 @@ class ObjectTest(BaseTest):
         return True
 
 
+class InboxTest(BaseTest):
+    """GET Actor Inbox + Actor Inbox Is OrderedCollection (MUST per AP spec)."""
+
+    def skip(self) -> bool:
+        if not self.ctx.actor_id:
+            log.info("Skipping; Actor ID not configured")
+            return True
+        return False
+
+    def run(self) -> bool:
+        try:
+            log.info("Dereference Actor for inbox IRI")
+            actor = transport.get(self.ctx.actor_id)
+        except requests.HTTPError:
+            log.error("Failed to get actor %s", self.ctx.actor_id)
+            return False
+
+        inbox_iri = actor.get("inbox")
+        if not inbox_iri:
+            log.error("Actor has no inbox field")
+            return False
+
+        try:
+            log.info("Dereference Actor inbox")
+            inbox = transport.get(inbox_iri)
+        except requests.HTTPError:
+            log.error("Failed to dereference actor inbox %s", inbox_iri)
+            return False
+
+        t = inbox.get("type")
+        if t not in ("OrderedCollection", "OrderedCollectionPage"):
+            log.error("Invalid inbox type %s", t)
+            return False
+
+        return True
+
+
 class DeletedObject(BaseTest):
     def skip(self) -> bool:
         if not self.ctx.deleted_object_id:
@@ -214,6 +251,16 @@ class DeletedObject(BaseTest):
                     expected_code,
                 )
                 return False
+            if self.ctx.use_tombstone:
+                try:
+                    body = resp.json()
+                    if body.get("type") != "Tombstone":
+                        log.warning(
+                            "Expected Tombstone type in body, got %s",
+                            body.get("type"),
+                        )
+                except Exception:  # pylint: disable=broad-except
+                    log.warning("Could not parse response body for Tombstone check")
         return True
 
 
@@ -281,6 +328,7 @@ class PrivateObject(BaseTest):
 
 COMMON_TESTS = [
     ActorTest,
+    InboxTest,
     ObjectTest,
     DeletedObject,
     InvalidObject,

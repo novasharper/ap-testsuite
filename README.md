@@ -40,6 +40,16 @@ This is meant to approximate the test suite at [go-fed/testsuite](https://github
   - If outbox is an `OrderedCollectionPage`, get first page and validate
     that it is an `OrderedCollection`
 
+- [x] Get Actor Inbox
+
+  Requires:
+  - Actor ID
+
+  Logic:
+  - Get actor based on id
+  - Use 'inbox' field of actor to dereference inbox
+  - Validate inbox type is `OrderedCollection` or `OrderedCollectionPage`
+
 - [x] Get Object
 
   Validate that server supports both AS2 media types
@@ -65,7 +75,7 @@ This is meant to approximate the test suite at [go-fed/testsuite](https://github
   Logic:
   - Try to fetch object that has been deleted
   - Check error code.
-    - `Tombstones?` => `410 Gone`
+    - `Tombstones?` => `410 Gone` + warn if body is not type `Tombstone`
     - `No Tombstones.` => `404 Not Found`
 
   TODO:
@@ -101,46 +111,46 @@ This is meant to approximate the test suite at [go-fed/testsuite](https://github
 <details><summary>Federating test cases</summary>
 <p>
 
-  - [ ] Delivers all activities posted in the outbox
-  - [ ] GET Actor outbox
-  - [ ] Outbox contains delivered Activities
-  - [ ] Uses `to` to determine delivery recipients
-  - [ ] Uses `cc` to determine delivery recipients
-  - [ ] Uses `bto` to determine delivery recipients
-  - [ ] Uses `bcc` to determine delivery recipients
-  - [ ] Provides and `id` in non-transient activities sent to other servers
-  - [ ] Dereferences delivery targets with user's credentials
-  - [ ] Delivers to Actors in Collections/OrderedCollections
-  - [ ] Delivers to nested Actors in Collections/OrderedCollections
-  - [ ] Delivers Create with Object
-  - [ ] Delivers Update with Object
-  - [ ] Delivers Delete with Object
-  - [ ] Delivers Follow with Object
-  - [ ] Delivers Add with Object and Target
-  - [ ] Delivers Remove with Object and Target
-  - [ ] Delivers Like with Object
-  - [ ] Delivers Block with Object
-  - [ ] Delivers Undo with Object
-  - [ ] Does not double-deliver the same activity
-  - [ ] Does not self-address an activity
-  - [ ] Should not deliver blocks
-  - [ ] Delivers create activity for artical to federated peer
-  - [ ] Dedupes Actor inbox
-  - [ ] Send a follow request for acceptance
-  - [ ] Accept a follow request
-  - [ ] Send a follow request for rejection
-  - [ ] Reject a follow request
-  - [ ] GET Followers collection
-  - [ ] Receives Accept-Follow activity from federated peer
-  - [ ] Receives Reject-Follow activity from federated peer
-  - [ ] GET Following collection
-  - [ ] Following collection has Accepted-Follow Actor
-  - [ ] Following Collection does not have Rejected-Follow Actor
-  - [ ] Send Activity with followers also addressed
-  - [ ] Handles a reply requiring inbox forwarding
-  - [ ] Applied inbox forwarding
-  - [ ] Does not process update activity from unauthorized actor
-  - [ ] Confirm whether unauthorized update applied
+  - [x] Delivers all activities posted in the outbox
+  - [x] GET Actor outbox
+  - [x] Outbox contains delivered Activities
+  - [x] Uses `to` to determine delivery recipients
+  - [x] Uses `cc` to determine delivery recipients
+  - [x] Uses `bto` to determine delivery recipients
+  - [x] Uses `bcc` to determine delivery recipients
+  - [x] Provides and `id` in non-transient activities sent to other servers
+  - [x] Dereferences delivery targets with user's credentials
+  - [x] Delivers to Actors in Collections/OrderedCollections
+  - [x] Delivers to nested Actors in Collections/OrderedCollections
+  - [x] Delivers Create with Object
+  - [x] Delivers Update with Object
+  - [x] Delivers Delete with Object
+  - [x] Delivers Follow with Object
+  - [x] Delivers Add with Object and Target
+  - [x] Delivers Remove with Object and Target
+  - [x] Delivers Like with Object
+  - [x] Delivers Block with Object
+  - [x] Delivers Undo with Object
+  - [x] Does not double-deliver the same activity
+  - [x] Does not self-address an activity
+  - [x] Should not deliver blocks
+  - [x] Delivers create activity for artical to federated peer
+  - [x] Dedupes Actor inbox
+  - [x] Send a follow request for acceptance
+  - [x] Accept a follow request
+  - [x] Send a follow request for rejection
+  - [x] Reject a follow request
+  - [x] GET Followers collection
+  - [x] Receives Accept-Follow activity from federated peer
+  - [x] Receives Reject-Follow activity from federated peer
+  - [x] GET Following collection
+  - [x] Following collection has Accepted-Follow Actor
+  - [x] Following Collection does not have Rejected-Follow Actor
+  - [x] Send Activity with followers also addressed
+  - [x] Handles a reply requiring inbox forwarding
+  - [x] Applied inbox forwarding
+  - [x] Does not process update activity from unauthorized actor
+  - [x] Confirm whether unauthorized update applied
 
 </p>
 </details>
