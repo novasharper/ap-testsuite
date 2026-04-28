@@ -1,5 +1,5 @@
 # Copyright (c) 2023 Pat Long
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: MIT
 
 import logging
 import tomllib as toml
@@ -21,6 +21,13 @@ class TestContext:
         "deleted_object_id",
         "invalid_object_id",
         "private_object_id",
+        # Federation entity IDs
+        "local_actor_id",
+        "inbox_id",
+        "followers_id",
+        "following_id",
+        "accepted_follow_actor_id",
+        "rejected_follow_actor_id",
         # Config
         "use_tombstone",
         "use_forbidden",
@@ -29,16 +36,29 @@ class TestContext:
     def __init__(self) -> None:
         self.db = {}
         self.server = None
-        # ARGS
-        ## Entity IDs
+        # Entity IDs
         self.actor_id = None
         self.object_id = None
         self.deleted_object_id = None
         self.invalid_object_id = None
         self.private_object_id = None
-        ## Config
+        # Federation entity IDs
+        self.local_actor_id = None
+        self.inbox_id = None
+        self.followers_id = None
+        self.following_id = None
+        self.accepted_follow_actor_id = None
+        self.rejected_follow_actor_id = None
+        # Config flags
         self.use_tombstone = None
         self.use_forbidden = None
+        # Auth + local server (populated by load_config, not CLI)
+        self.auth = None
+        self.local_server = None
+
+    @property
+    def has_local_server(self) -> bool:
+        return self.local_server is not None
 
     def validate(self, arg: str, argv: Any):
         if argv is None:
@@ -87,6 +107,26 @@ class TestContext:
         )
         return True
 
+    def _load_auth_config(self, test_config: dict):
+        if "auth" not in test_config:
+            return
+        from .auth import load_auth  # pylint: disable=import-outside-toplevel
+        auth_cfg = test_config["auth"]
+        if "actor_id" not in auth_cfg and self.local_actor_id:
+            auth_cfg = auth_cfg | {"actor_id": self.local_actor_id}
+        self.auth = load_auth(auth_cfg)
+
+    def _load_server_config(self, test_config: dict):
+        if "local_server" not in test_config:
+            return
+        from .server import InboxServer  # pylint: disable=import-outside-toplevel
+        srv = test_config["local_server"]
+        self.local_server = InboxServer(
+            port=srv.get("port", 0),
+            public_url=srv.get("public_url"),
+            auth=self.auth,
+        )
+
     def load_config(self, config_file):
         with open(config_file, "rb") as f:
             cfg = toml.load(f)
@@ -113,6 +153,9 @@ class TestContext:
                     argv = urljoin(self.server, argv)
                 any_arg |= bool(argv)
                 self.setarg(arg, argv)
+
+        self._load_auth_config(test_config)
+        self._load_server_config(test_config)
 
         return any_arg
 

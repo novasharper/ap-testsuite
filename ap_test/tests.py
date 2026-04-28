@@ -1,5 +1,5 @@
 # Copyright (c) 2023 Pat Long
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: MIT
 
 import logging
 
@@ -9,6 +9,27 @@ from .helper import TestContext
 from . import transport
 
 log = logging.getLogger(__name__)
+
+AS_PUBLIC = "https://www.w3.org/ns/activitystreams#Public"
+
+
+def find_in_collection(iri: str, target_id: str) -> bool:
+    """Return True if target_id appears anywhere in a (possibly paginated) AP collection."""
+    visited = set()
+    current = iri
+    while current and current not in visited:
+        visited.add(current)
+        try:
+            col = transport.get(current)
+        except requests.HTTPError:
+            return False
+        items = col.get("orderedItems") or col.get("items") or []
+        for item in items:
+            item_id = item.get("id") if isinstance(item, dict) else item
+            if item_id == target_id:
+                return True
+        current = col.get("next")
+    return False
 
 
 class BaseTest:
@@ -20,6 +41,45 @@ class BaseTest:
 
     def run(self) -> bool:
         raise NotImplementedError
+
+
+class FederationTest(BaseTest):  # pylint: disable=abstract-method
+    """Skips if local_actor_id or auth not configured."""
+
+    def skip(self) -> bool:
+        if not self.ctx.local_actor_id:
+            log.info("Skipping; local_actor_id not configured")
+            return True
+        if not self.ctx.auth:
+            log.info("Skipping; auth not configured")
+            return True
+        return False
+
+    def _get_actor(self) -> dict | None:
+        try:
+            return transport.get(self.ctx.local_actor_id, auth=self.ctx.auth)
+        except requests.HTTPError as exc:
+            log.error("Failed to fetch local actor: %s", exc)
+            return None
+
+    def _post_activity(self, outbox_url: str, activity: dict) -> dict | None:
+        try:
+            return transport.post(outbox_url, activity, auth=self.ctx.auth)
+        except requests.HTTPError as exc:
+            log.error("POST to outbox failed: %s", exc)
+            return None
+
+
+class ServerRequiredTest(FederationTest):  # pylint: disable=abstract-method
+    """Also skips if local_server not configured."""
+
+    def skip(self) -> bool:
+        if super().skip():
+            return True
+        if not self.ctx.has_local_server:
+            log.info("Skipping; local_server not configured")
+            return True
+        return False
 
 
 class ActorTest(BaseTest):

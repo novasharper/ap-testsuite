@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # Copyright (c) 2023 Pat Long
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: MIT
 
 import argparse as ap
 import logging
 
 from ap_test.helper import TestContext
 from ap_test.tests import BaseTest, COMMON_TESTS
+from ap_test.federation import FEDERATION_TESTS
 
 
 def run_tests(tests: list[BaseTest], failfast: bool = False):
@@ -27,6 +28,15 @@ def run_tests(tests: list[BaseTest], failfast: bool = False):
             return False
 
     return True
+
+
+def _run_federation(ctx: TestContext, failfast: bool):
+    tests = [tc(ctx) for tc in FEDERATION_TESTS]
+    if ctx.has_local_server:
+        with ctx.local_server:
+            run_tests(tests, failfast=failfast)
+    else:
+        run_tests(tests, failfast=failfast)
 
 
 def main():
@@ -67,6 +77,10 @@ def main():
         [tc(ctx) for tc in COMMON_TESTS],
         failfast=opt.failfast,
     )
+
+    print()
+    print("=== RUNNING FEDERATION TESTS ===")
+    _run_federation(ctx, opt.failfast)
 
 
 if __name__ == "__main__":

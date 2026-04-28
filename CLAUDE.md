@@ -32,9 +32,9 @@ There is no unit test suite — the tests *are* the product (AP compliance check
 
 ### Core Components
 
-- **`ap_test/__main__.py`** — CLI entry point. Parses args, builds a `TestContext`, iterates `COMMON_TESTS`, calls `skip()` then `run()` on each. Handles verbosity, failfast, and barrier-separated output.
-- **`ap_test/helper.py`** — `TestContext` class. Holds all configuration state (actor_id, object_id, flags). `load_config()` reads a TOML file; `load_opts()` applies CLI overrides. Performs WebFinger lookup when a `user@domain` string is given instead of a URL.
-- **`ap_test/transport.py`** — Thin HTTP wrapper. Provides `ACTIVITY_TYPE` and `PROFILE_TYPE` header constants for ActivityPub content negotiation. The `get()` function sets Accept headers and calls `raise_for_status()`.
+- **`ap_test/__main__.py`** — CLI entry point. Parses args, builds a `TestContext`, iterates `COMMON_TESTS`, calls `skip()` then `run()` on each. Handles verbosity, failfast, and barrier-separated output. CLI args are auto-generated from `TestContext.ARGS` (names ending in `_id` become `--store` args; names starting with `use_` become `--store_true` flags).
+- **`ap_test/helper.py`** — `TestContext` class. Holds all configuration state (actor_id, object_id, flags). `load_config()` reads a TOML file; `load_opts()` applies CLI overrides. Performs WebFinger lookup when a `user@domain` string is given instead of a URL. `setarg()` refuses to overwrite already-set values with `None`, so CLI flags take precedence over TOML when explicitly provided.
+- **`ap_test/transport.py`** — Thin HTTP wrapper. `get(iri, with_profile=False)` sends a GET with either `Accept: application/activity+json` (default) or `Accept: application/ld+json; profile="..."` (when `with_profile=True`), then calls `raise_for_status()` and returns parsed JSON. `post_headers()` exists for future C2S use.
 - **`ap_test/tests.py`** — All test classes. Each subclasses `BaseTest` (which holds `self.ctx`), overrides `run() -> bool` and optionally `skip() -> bool`. `ActorTest` can auto-discover `object_id` and `invalid_object_id` from the actor's outbox.
 
 ### Adding a New Test
@@ -46,16 +46,32 @@ There is no unit test suite — the tests *are* the product (AP compliance check
 
 ### Configuration
 
-`testconfig.toml` is the canonical example:
+`testconfig.toml` is the canonical example. Either `user` (WebFinger `user@domain`) or `server` (base URL) must be present. Resource IDs in `[test_config.resources]` are resolved relative to the server base URL:
+
 ```toml
 [test_config]
 user = 'LWN@fosstodon.org'
-# Optional: object_id, invalid_object_id, deleted_object_id, private_object_id
-# Flags: use_tombstone (bool), use_forbidden (bool)
+# Alternative: server = 'https://fosstodon.org'
+
+[test_config.resources]
+# Optional — relative paths resolved against server base URL
+# actor_id = 'users/LWN'
+# object_id = 'users/LWN/statuses/109616553771932554/activity'
+# deleted_object_id = ''
+# invalid_object_id = 'users/LWN/statuses/invalid-object-id'
+# private_object_id = ''
+# Flags:
+# use_tombstone = true   # deleted objects return 410 Gone instead of 404
+# use_forbidden = true   # private objects return 403 Forbidden instead of 404
 ```
 
-Config precedence: TOML `[resources]` section → WebFinger-derived values → CLI `--` flags. Relative resource paths are automatically resolved against the configured server base URL.
+Config precedence: TOML `[resources]` section → WebFinger-derived values → CLI `--` flags (CLI wins when explicitly set).
 
 ### Linting
 
-Pylint is configured via `pylint.toml` with `fail-under = 10` (must score 10/10 to pass). CI runs on Python 3.8–3.11 whenever `.py` files are changed.
+Pylint is configured via `pylint.toml` with `fail-under = 10` (must score 10/10 to pass). CI runs on Python 3.11–3.13 whenever `.py` files are changed.
+
+### Planned Work (from README)
+
+- Auth support (OAuth, cookie, password) — required for Client-to-Server operations like inbox access
+- Federating test cases (delivery, Follow/Accept/Reject flows, inbox forwarding, etc.)

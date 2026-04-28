@@ -8,3 +8,42 @@ user = 'LWN@fosstodon.org'
 #deleted_object_id = ''
 #invalid_object_id = 'users/LWN/statuses/109616553771932550/activity'
 #private_object_id = ''
+
+# ---------------------------------------------------------------------------
+# Federation testing (all sections optional)
+# ---------------------------------------------------------------------------
+
+# Uncomment and fill in to enable federation tests.
+# local_actor_id is the ActivityPub actor URL for the account you control
+# on the server under test (used to POST activities via C2S).
+
+#local_actor_id = 'https://fosstodon.org/users/myaccount'
+
+#[test_config.resources]
+# Resource IDs are resolved relative to the server base URL.
+#inbox_id             = 'users/myaccount/inbox'
+#followers_id         = 'users/myaccount/followers'
+#following_id         = 'users/myaccount/following'
+#accepted_follow_actor_id  = 'https://remote.example/users/alice'
+#rejected_follow_actor_id  = 'https://remote.example/users/bob'
+
+#[test_config.auth]
+# Choose one auth type:
+#
+# HTTP Signatures (recommended for S2S federation):
+#type = 'http_signature'
+#private_key_file = 'private.pem'   # path to RSA private key PEM file
+#
+# OAuth Bearer token (for Mastodon-compatible C2S):
+#type = 'bearer'
+#token = 'eyJhbGci...'
+#
+# Cookie-based session auth:
+#type = 'cookie'
+#cookie = 'session=abc123'
+
+#[test_config.local_server]
+# Spins up a local HTTP server on the given port to receive callbacks from
+# the remote ActivityPub server (required for bidirectional tests).
+#port = 8080
+#public_url = 'https://abc123.ngrok.io'   # public URL pointing to port above
