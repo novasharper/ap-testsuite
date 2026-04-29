@@ -3,7 +3,7 @@
 
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 import requests
 
@@ -18,7 +18,7 @@ ACTIVITY_TYPE = "application/activity+json"
 def default_headers() -> dict[str, str]:
     return {
         "Accept-Charset": "utf-8",
-        "Date": datetime.now().strftime("%a, %d %b %Y %H:%M:%S"),
+        "Date": datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT"),
         "User-Agent": "ap-testsuite",
     }
 
@@ -40,7 +40,13 @@ def get(iri: str, with_profile: bool = False, auth: BaseAuth | None = None):
         headers = headers | auth.sign_request("GET", iri, headers, None)
     r = requests.get(iri, headers=headers, timeout=30.0)
     r.raise_for_status()
-    return r.json()
+    try:
+        return r.json()
+    except (requests.exceptions.JSONDecodeError, ValueError):
+        log.warning(
+            "Non-JSON response from %s (Content-Type: %s)", iri, r.headers.get("Content-Type")
+        )
+        raise
 
 
 def post(iri: str, body: dict, auth: BaseAuth | None = None):

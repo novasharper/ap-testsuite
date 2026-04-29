@@ -1,6 +1,7 @@
 # Copyright (c) 2023 Pat Long
 # SPDX-License-Identifier: MIT
 
+import json
 import logging
 
 import requests
@@ -96,8 +97,13 @@ class ActorTest(BaseTest):
         return False
 
     def _maybe_select_object(self, outboxItems: list[dict]):
+        if not outboxItems:
+            return
         activity = outboxItems[0]
-        object_id = activity["object"]["id"]
+        obj = activity.get("object")
+        if obj is None:
+            return
+        object_id = obj["id"] if isinstance(obj, dict) else obj
         if self.ctx.object_id is None:
             self.ctx.object_id = object_id
 
@@ -116,8 +122,8 @@ class ActorTest(BaseTest):
             log.error("Failed to get actor outbox page %s", outbox_page_iri)
             return False
 
-        if outbox_page["type"] != "OrderedCollectionPage":
-            log.error("Invalid type for outbox page %s", outbox_page["type"])
+        if outbox_page.get("type") != "OrderedCollectionPage":
+            log.error("Invalid type for outbox page %s", outbox_page.get("type"))
             return False
 
         if "orderedItems" not in outbox_page:
@@ -136,7 +142,7 @@ class ActorTest(BaseTest):
             return False
 
         log.info("Validate outbox type")
-        t = outbox["type"]
+        t = outbox.get("type")
         if t not in ("OrderedCollection", "OrderedCollectionPage"):
             log.error("Invalid outbox type %s", t)
             return False
@@ -146,7 +152,11 @@ class ActorTest(BaseTest):
             self._maybe_select_object(outbox["orderedItems"])
             return True
 
-        return self._check_outbox_page(outbox["first"])
+        first = outbox.get("first")
+        if not first:
+            log.error("Outbox has no orderedItems and no first page")
+            return False
+        return self._check_outbox_page(first)
 
     def run(self) -> bool:
         try:
@@ -156,7 +166,11 @@ class ActorTest(BaseTest):
             log.error("Failed to get actor %s", self.ctx.actor_id)
             return False
 
-        return self._check_outbox(actor["outbox"])
+        outbox_iri = actor.get("outbox")
+        if not outbox_iri:
+            log.error("Actor has no outbox field")
+            return False
+        return self._check_outbox(outbox_iri)
 
 
 class ObjectTest(BaseTest):
@@ -171,14 +185,14 @@ class ObjectTest(BaseTest):
             log.info("Dereference object (accept=activity+json)")
             transport.get(self.ctx.object_id)
         except requests.HTTPError as e:
-            log.error("Get with profile failed: %s", e)
+            log.error("Get with activity+json failed: %s", e)
             return False
 
         try:
             log.info("Dereference object (accept=ld+json, profile specified)")
             transport.get(self.ctx.object_id, True)
         except requests.HTTPError as e:
-            log.error("Get with activity failed: %s", e)
+            log.error("Get with ld+json profile failed: %s", e)
             return False
 
         return True
@@ -259,7 +273,7 @@ class DeletedObject(BaseTest):
                             "Expected Tombstone type in body, got %s",
                             body.get("type"),
                         )
-                except Exception:  # pylint: disable=broad-except
+                except (json.JSONDecodeError, ValueError):
                     log.warning("Could not parse response body for Tombstone check")
         return True
 

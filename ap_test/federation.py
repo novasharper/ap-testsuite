@@ -10,6 +10,8 @@ from .tests import AS_PUBLIC, BaseTest, FederationTest, ServerRequiredTest, find
 
 log = logging.getLogger(__name__)
 
+AS_CONTEXT = "https://www.w3.org/ns/activitystreams"
+
 
 # ---------------------------------------------------------------------------
 # Activity construction helpers
@@ -17,6 +19,7 @@ log = logging.getLogger(__name__)
 
 def _make_note(actor_id: str) -> dict:
     return {
+        "@context": AS_CONTEXT,
         "type": "Note",
         "attributedTo": actor_id,
         "content": "ap-testsuite test note",
@@ -26,6 +29,7 @@ def _make_note(actor_id: str) -> dict:
 
 def _make_create(actor_id: str, obj: dict) -> dict:
     return {
+        "@context": AS_CONTEXT,
         "type": "Create",
         "actor": actor_id,
         "object": obj,
@@ -210,6 +214,7 @@ class DeliversCreateTest(_ActivityTypeTest):
 class DeliversUpdateTest(_ActivityTypeTest):
     def _make_activity(self, actor_id: str) -> dict:
         return {
+            "@context": AS_CONTEXT,
             "type": "Update",
             "actor": actor_id,
             "object": {"type": "Note", "id": f"{actor_id}/notes/test", "content": "updated"},
@@ -220,6 +225,7 @@ class DeliversUpdateTest(_ActivityTypeTest):
 class DeliversDeleteTest(_ActivityTypeTest):
     def _make_activity(self, actor_id: str) -> dict:
         return {
+            "@context": AS_CONTEXT,
             "type": "Delete",
             "actor": actor_id,
             "object": f"{actor_id}/notes/test",
@@ -238,6 +244,7 @@ class DeliversFollowTest(_ActivityTypeTest):
 
     def _make_activity(self, actor_id: str) -> dict:
         return {
+            "@context": AS_CONTEXT,
             "type": "Follow",
             "actor": actor_id,
             "object": self.ctx.actor_id,
@@ -247,6 +254,7 @@ class DeliversFollowTest(_ActivityTypeTest):
 class DeliversAddTest(_ActivityTypeTest):
     def _make_activity(self, actor_id: str) -> dict:
         return {
+            "@context": AS_CONTEXT,
             "type": "Add",
             "actor": actor_id,
             "object": f"{actor_id}/notes/test",
@@ -258,6 +266,7 @@ class DeliversAddTest(_ActivityTypeTest):
 class DeliversRemoveTest(_ActivityTypeTest):
     def _make_activity(self, actor_id: str) -> dict:
         return {
+            "@context": AS_CONTEXT,
             "type": "Remove",
             "actor": actor_id,
             "object": f"{actor_id}/notes/test",
@@ -277,6 +286,7 @@ class DeliversLikeTest(_ActivityTypeTest):
 
     def _make_activity(self, actor_id: str) -> dict:
         return {
+            "@context": AS_CONTEXT,
             "type": "Like",
             "actor": actor_id,
             "object": self.ctx.object_id,
@@ -295,6 +305,7 @@ class DeliversBlockTest(_ActivityTypeTest):
 
     def _make_activity(self, actor_id: str) -> dict:
         return {
+            "@context": AS_CONTEXT,
             "type": "Block",
             "actor": actor_id,
             "object": self.ctx.actor_id,
@@ -312,6 +323,7 @@ class DeliversUndoTest(_ActivityTypeTest):
 
     def _make_activity(self, actor_id: str) -> dict:
         return {
+            "@context": AS_CONTEXT,
             "type": "Undo",
             "actor": actor_id,
             "object": {
@@ -328,6 +340,7 @@ class DeliversArticleTest(FederationTest):
         if actor is None:
             return False
         article = {
+            "@context": AS_CONTEXT,
             "type": "Create",
             "actor": self.ctx.local_actor_id,
             "object": {
@@ -404,6 +417,7 @@ class NoDeliverBlocksTest(FederationTest):
         if actor is None:
             return False
         block = {
+            "@context": AS_CONTEXT,
             "type": "Block",
             "actor": self.ctx.local_actor_id,
             "object": self.ctx.actor_id,
@@ -473,6 +487,7 @@ class SendFollowAcceptanceTest(FederationTest):
         if actor is None:
             return False
         follow = {
+            "@context": AS_CONTEXT,
             "type": "Follow",
             "actor": self.ctx.local_actor_id,
             "object": self.ctx.actor_id,
@@ -495,6 +510,7 @@ class SendFollowRejectionTest(FederationTest):
         if actor is None:
             return False
         follow = {
+            "@context": AS_CONTEXT,
             "type": "Follow",
             "actor": self.ctx.local_actor_id,
             "object": self.ctx.rejected_follow_actor_id,
@@ -521,6 +537,7 @@ class AcceptFollowTest(FederationTest):
             return False
         follow_id = f"{self.ctx.local_actor_id}/activities/accept-follow-test"
         accept = {
+            "@context": AS_CONTEXT,
             "type": "Accept",
             "actor": self.ctx.local_actor_id,
             "object": {
@@ -556,6 +573,7 @@ class RejectFollowTest(FederationTest):
             return False
         follow_id = f"{self.ctx.local_actor_id}/activities/reject-follow-test"
         reject = {
+            "@context": AS_CONTEXT,
             "type": "Reject",
             "actor": self.ctx.local_actor_id,
             "object": {
@@ -587,6 +605,7 @@ class NoUnauthorizedUpdateTest(FederationTest):
         if actor is None:
             return False
         update = {
+            "@context": AS_CONTEXT,
             "type": "Update",
             "actor": self.ctx.local_actor_id,
             "object": {
@@ -743,6 +762,7 @@ class ReceiveAcceptFollowTest(ServerRequiredTest):
         if actor is None:
             return False
         follow = {
+            "@context": AS_CONTEXT,
             "type": "Follow",
             "actor": self.ctx.local_actor_id,
             "object": self.ctx.actor_id,
@@ -775,6 +795,7 @@ class ReceiveRejectFollowTest(ServerRequiredTest):
         if actor is None:
             return False
         follow = {
+            "@context": AS_CONTEXT,
             "type": "Follow",
             "actor": self.ctx.local_actor_id,
             "object": self.ctx.rejected_follow_actor_id,
@@ -860,6 +881,7 @@ class InboxForwardingTest(ServerRequiredTest):
             log.error("Failed to resolve remote actor inbox: %s", exc)
             return False
         activity = {
+            "@context": AS_CONTEXT,
             "type": "Create",
             "actor": self.ctx.local_actor_id,
             "object": {

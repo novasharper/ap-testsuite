@@ -3,7 +3,6 @@
 
 import base64
 import hashlib
-import json
 import logging
 from datetime import datetime, timezone
 from urllib.parse import urlparse
@@ -48,7 +47,7 @@ class HttpSignatureAuth(BaseAuth):  # pylint: disable=too-few-public-methods
     def sign_request(self, method: str, url: str, headers: dict, body: bytes | None) -> dict:
         date = datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT")
         parsed = urlparse(url)
-        path = parsed.path + (f"?{parsed.query}" if parsed.query else "")
+        path = (parsed.path or "/") + (f"?{parsed.query}" if parsed.query else "")
 
         signed = ["(request-target)", "host", "date"]
         parts = [
@@ -91,28 +90,3 @@ def load_auth(config: dict) -> BaseAuth | None:
     if auth_type is None:
         return None
     raise ValueError(f"Unknown auth type: {auth_type!r}")
-
-
-def build_activity(activity_type: str, actor_id: str, obj: dict | str, **kwargs) -> dict:
-    activity = {
-        "type": activity_type,
-        "actor": actor_id,
-        "object": obj,
-    }
-    activity.update(kwargs)
-    return activity
-
-
-def build_note(actor_id: str, content: str, **kwargs) -> dict:
-    note = {
-        "type": "Note",
-        "attributedTo": actor_id,
-        "content": content,
-        "to": ["https://www.w3.org/ns/activitystreams#Public"],
-    }
-    note.update(kwargs)
-    return note
-
-
-def encode_body(body: dict) -> bytes:
-    return json.dumps(body).encode("utf-8")

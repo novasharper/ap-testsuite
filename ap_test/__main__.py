@@ -4,6 +4,7 @@
 
 import argparse as ap
 import logging
+import sys
 
 from ap_test.helper import TestContext
 from ap_test.tests import BaseTest, COMMON_TESTS
@@ -30,13 +31,12 @@ def run_tests(tests: list[BaseTest], failfast: bool = False):
     return True
 
 
-def _run_federation(ctx: TestContext, failfast: bool):
+def _run_federation(ctx: TestContext, failfast: bool) -> bool:
     tests = [tc(ctx) for tc in FEDERATION_TESTS]
     if ctx.has_local_server:
         with ctx.local_server:
-            run_tests(tests, failfast=failfast)
-    else:
-        run_tests(tests, failfast=failfast)
+            return run_tests(tests, failfast=failfast)
+    return run_tests(tests, failfast=failfast)
 
 
 def main():
@@ -73,14 +73,16 @@ def main():
         return
 
     print("=== RUNNING BASE TESTS ===")
-    run_tests(
+    base_passed = run_tests(
         [tc(ctx) for tc in COMMON_TESTS],
         failfast=opt.failfast,
     )
 
     print()
     print("=== RUNNING FEDERATION TESTS ===")
-    _run_federation(ctx, opt.failfast)
+    fed_passed = _run_federation(ctx, opt.failfast)
+
+    sys.exit(0 if (base_passed and fed_passed) else 1)
 
 
 if __name__ == "__main__":

@@ -72,8 +72,9 @@ class TestContext:
             if not isinstance(argv, str):
                 raise TypeError(f"value for {arg} must be a string")
 
-            # Ensure that arg is a valid url
-            urlparse(argv)
+            parsed = urlparse(argv)
+            if parsed.scheme not in ("http", "https") or not parsed.netloc:
+                raise ValueError(f"value for {arg} must be a valid http/https URL, got {argv!r}")
 
     def setarg(self, arg, argv):
         if arg not in self.ARGS:
@@ -102,9 +103,14 @@ class TestContext:
             log.error("failed to fetch webfinger info for %s: %s", user, exc)
             return False
 
-        self.actor_id = next(
-            link["href"] for link in info["links"] if link["rel"] == "self"
+        link = next(
+            (link for link in info.get("links", []) if link.get("rel") == "self"),
+            None,
         )
+        if link is None:
+            log.error("No self link found in webfinger response for %s", user)
+            return False
+        self.actor_id = link["href"]
         return True
 
     def _load_auth_config(self, test_config: dict):
@@ -158,13 +164,3 @@ class TestContext:
         self._load_server_config(test_config)
 
         return any_arg
-
-
-def get_id(obj) -> str:
-    """Get ID for JSON-LD object
-
-    TODO: Implement support for non-href id???
-    """
-    if "@id" in obj:
-        return obj["@id"]
-    return obj.get("id")

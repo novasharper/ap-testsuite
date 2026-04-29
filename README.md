@@ -9,13 +9,13 @@ This is meant to approximate the test suite at [go-fed/testsuite](https://github
 ## General
 
 - [x] Add support for configuring via config file instead of arguments
-- [ ] Add auth support
-
-  This is needed for Client2Server operations (e.g., getting the inbox)
+- [x] Add auth support
 
   Auth Types:
+  - [x] HTTP Signature
+  - [x] Cookie Auth
+  - [x] Bearer token
   - [ ] OAuth flow (generate bearer token)
-  - [ ] Cookie Auth
   - [ ] Password Auth
 
   NOTE: OAuth flow will likely require password/cookie support to generate
@@ -134,7 +134,7 @@ This is meant to approximate the test suite at [go-fed/testsuite](https://github
   - [x] Does not double-deliver the same activity
   - [x] Does not self-address an activity
   - [x] Should not deliver blocks
-  - [x] Delivers create activity for artical to federated peer
+  - [x] Delivers create activity for article to federated peer
   - [x] Dedupes Actor inbox
   - [x] Send a follow request for acceptance
   - [x] Accept a follow request

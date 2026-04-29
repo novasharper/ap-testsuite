@@ -5,7 +5,7 @@ requires-python = ">=3.11"
 license = {file = "LICENSE"}
 dependencies = [
     "requests",
-    "cryptography (>=47,<47.1)",
+    "cryptography (>=47,<48)",
 ]
 
 [project.scripts]
